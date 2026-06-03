@@ -1,0 +1,46 @@
+# FILE: .gitignore
+
+# ── Node.js ───────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp.*
+
+# ── Builds ───────────────────────────────────────────────────────────────────
+dist/
+build/
+out/
+
+# ── Variáveis de ambiente ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ── Tauri ─────────────────────────────────────────────────────────────────────
+frontend/src-tauri/target/
+frontend/src-tauri/WixTools/
+frontend/src-tauri/*.pdb
+frontend/src-tauri/gen/
+
+# ── Capacitor / Android ───────────────────────────────────────────────────────
+frontend/android/.gradle/
+frontend/android/app/build/
+frontend/android/local.properties
+frontend/android/.idea/
+frontend/android/*.iml
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── Sistema ───────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log

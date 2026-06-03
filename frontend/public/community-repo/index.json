@@ -1,0 +1,48 @@
+{
+  "name": "Repositório Oficial OmniMedia",
+  "description": "Plugins mantidos pela comunidade OmniMedia.",
+  "author": "omnimedia-community",
+  "version": "1.1.0",
+  "website": "https://github.com/omnimedia-community/plugins",
+  "plugins": [
+    {
+      "slug": "mangadex-reader",
+      "name": "MangaDex Reader",
+      "version": "1.0.0",
+      "description": "Catálogo público da MangaDex — mangás com tradução PT-BR e inglês.",
+      "author": "omnimedia-community",
+      "category": "comics",
+      "contentRating": "general",
+      "mediaTypes": ["image-series"],
+      "scriptUrl": "/plugins/mangadex-reader.js",
+      "tags": ["manga", "pt-br", "api-publica"],
+      "language": "pt-BR"
+    },
+    {
+      "slug": "gutenberg-reader",
+      "name": "Project Gutenberg",
+      "version": "1.0.0",
+      "description": "+70.000 e-books de domínio público. Literatura clássica mundial.",
+      "author": "omnimedia-community",
+      "category": "ebooks",
+      "contentRating": "general",
+      "mediaTypes": ["ebook"],
+      "scriptUrl": "/plugins/gutenberg-reader.js",
+      "tags": ["ebooks", "dominio-publico", "classicos"],
+      "language": "pt-BR"
+    },
+    {
+      "slug": "streamhub-hls",
+      "name": "StreamHub HLS",
+      "version": "2.1.3",
+      "description": "Player HLS para streams públicos M3U8 e VODs de domínio público.",
+      "author": "omnimedia-community",
+      "category": "video",
+      "contentRating": "general",
+      "mediaTypes": ["video-stream"],
+      "scriptUrl": "/plugins/streamhub-hls.js",
+      "tags": ["hls", "m3u8", "streaming"],
+      "language": "pt-BR"
+    }
+  ]
+}

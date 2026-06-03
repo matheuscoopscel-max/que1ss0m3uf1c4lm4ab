@@ -1,0 +1,29 @@
+{
+  "name": "OmniMedia",
+  "short_name": "OmniMedia",
+  "description": "Agregador unificado de mídias open-source via plugins da comunidade.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "orientation": "any",
+  "lang": "pt-BR",
+  "categories": ["entertainment", "books", "video"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Biblioteca",
+      "url": "/?tab=library",
+      "description": "Abrir biblioteca de conteúdo"
+    },
+    {
+      "name": "Extensões",
+      "url": "/?tab=extensions",
+      "description": "Gerenciar extensões instaladas"
+    }
+  ]
+}

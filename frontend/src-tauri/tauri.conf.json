@@ -1,0 +1,100 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "OmniMedia",
+  "version": "1.0.0",
+  "identifier": "app.omnimedia.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "OmniMedia",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": ["'self'", "tauri:"],
+        "connect-src": [
+          "'self'",
+          "tauri:",
+          "http://localhost:3001",
+          "https://*.omnimedia.app",
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com"
+        ],
+        "img-src": [
+          "'self'",
+          "tauri:",
+          "data:",
+          "blob:",
+          "https:",
+          "http:"
+        ],
+        "media-src": [
+          "'self'",
+          "tauri:",
+          "blob:",
+          "https:",
+          "http:"
+        ],
+        "script-src": [
+          "'self'",
+          "'wasm-unsafe-eval'",
+          "blob:"
+        ],
+        "style-src": [
+          "'self'",
+          "'unsafe-inline'",
+          "https://fonts.googleapis.com"
+        ],
+        "font-src": [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "data:"
+        ],
+        "worker-src": ["blob:", "'self'"]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": [],
+    "externalBin": [],
+    "copyright": "",
+    "category": "Entertainment",
+    "shortDescription": "Aggregador unificado de mídias",
+    "longDescription": "OmniMedia é um agregador open-source de mídias mistas (quadrinhos, e-books, streaming de vídeo) via sistema de plugins modulares da comunidade.",
+    "deb": {
+      "depends": []
+    },
+    "appimage": {
+      "bundleMediaFramework": true
+    },
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    }
+  }
+}

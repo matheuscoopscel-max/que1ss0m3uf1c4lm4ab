@@ -1,0 +1,61 @@
+# FILE: docker-compose.yml (raiz do projeto)
+# OmniMedia — Ambiente completo: API + PostgreSQL
+#
+# Uso rápido:
+#   docker compose up -d
+#   docker compose exec api npm run migrate
+#   docker compose exec api npm run seed
+#
+# API disponível em: http://localhost:3001
+# PostgreSQL disponível em: localhost:5432 (usuário: omnimedia, senha: omnimedia_pass)
+
+version: "3.9"
+
+services:
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: omnimedia_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: omnimedia_db
+      POSTGRES_USER: omnimedia
+      POSTGRES_PASSWORD: omnimedia_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U omnimedia -d omnimedia_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── API Node.js ────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: omnimedia_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://omnimedia:omnimedia_pass@db:5432/omnimedia_db
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173
+      RATE_LIMIT_MAX: 100
+      SUBMIT_RATE_LIMIT_MAX: 5
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
