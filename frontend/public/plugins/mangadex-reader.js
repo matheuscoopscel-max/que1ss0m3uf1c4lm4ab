@@ -3,6 +3,9 @@
 // + browse sem limite (50 itens em vez de 20)
 
 const API_BASE   = "https://api.mangadex.org";
+const PROXY_BASE = typeof window !== "undefined" && window.OMNIMEDIA_API_URL
+  ? window.OMNIMEDIA_API_URL.replace("/api", "") + "/api/proxy/mangadex"
+  : "/api/proxy/mangadex";
 const COVER_BASE = "https://uploads.mangadex.org/covers";
 
 // Cache de tags para não buscar toda vez
@@ -51,7 +54,11 @@ async function throttledFetch(url, opts = {}) {
   const wait = Math.max(0, 220 - (now - lastCall));
   if (wait > 0) await new Promise((r) => setTimeout(r, wait));
   lastCall = Date.now();
-  const res  = await fetch(url, {
+  // Route through backend proxy to avoid CORS
+  const proxiedUrl = url.startsWith("https://api.mangadex.org")
+    ? PROXY_BASE + "?url=" + encodeURIComponent(url)
+    : url;
+  const res  = await fetch(proxiedUrl, {
     ...opts,
     headers: { "Content-Type": "application/json", ...(opts.headers ?? {}) },
   });
