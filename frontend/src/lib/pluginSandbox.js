@@ -20,6 +20,32 @@ const SANDBOX_TIMEOUT_MS = 45_000;
 /** Mapa de iframes ativos: slug → { iframe, pendingCalls } */
 const sandboxMap = new Map();
 
+// ── Fetch proxy: executa fetches do plugin no contexto do parent (evita null origin) ──
+window.addEventListener("message", async (event) => {
+  if (!event.data || event.data.type !== "PLUGIN_FETCH") return;
+  const { requestId, url, options } = event.data;
+  try {
+    const res = await fetch(url, options);
+    const text = await res.text();
+    event.source.postMessage({
+      type: "PLUGIN_FETCH_RESPONSE",
+      requestId,
+      ok: res.ok,
+      status: res.status,
+      body: text,
+    }, "*");
+  } catch (err) {
+    event.source.postMessage({
+      type: "PLUGIN_FETCH_RESPONSE",
+      requestId,
+      ok: false,
+      status: 0,
+      error: err.message,
+    }, "*");
+  }
+});
+
+
 let callIdCounter = 0;
 
 /**
