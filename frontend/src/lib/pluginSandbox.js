@@ -15,7 +15,7 @@
 // Fallback: se o ambiente não suportar iframe sandbox (ex: Tauri com CSP restritiva),
 //           recai para o método Blob URL do Patch #2.
 
-const SANDBOX_TIMEOUT_MS = 15_000;
+const SANDBOX_TIMEOUT_MS = 45_000;
 
 /** Mapa de iframes ativos: slug → { iframe, pendingCalls } */
 const sandboxMap = new Map();
