@@ -13,7 +13,7 @@ import { getApiBaseUrl } from "./platform.js";
 // URL do repositório oficial — GitHub em produção, local em dev
 const OFFICIAL_REPO_URL = import.meta.env.DEV
   ? "/community-repo/index.json"
-  : "https://raw.githubusercontent.com/omnimedia-community/plugins/main/index.json";
+  : "https://raw.githubusercontent.com/matheuscoopscel-max/que1ss0m3uf1c4lm4ab/main/frontend/public/community-repo/index.json";
 
 const DEFAULT_REPOSITORIES = [
   {
