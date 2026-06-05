@@ -61,6 +61,42 @@ function buildRunnerHTML(scriptUrl, slug) {
 <html>
 <head><meta charset="utf-8"></head>
 <body>
+<script>
+(function() {
+  window.fetch = function(url, options) {
+    options = options || {};
+    return new Promise(function(resolve, reject) {
+      var requestId = Math.random().toString(36).slice(2) + Date.now();
+      var timer = setTimeout(function() {
+        window.removeEventListener("message", handler);
+        reject(new Error("Fetch timeout: " + url));
+      }, 40000);
+      function handler(event) {
+        if (!event.data || event.data.type !== "OMNIMEDIA_FETCH_RESPONSE") return;
+        if (event.data.requestId !== requestId) return;
+        window.removeEventListener("message", handler);
+        clearTimeout(timer);
+        if (event.data.error) { reject(new Error(event.data.error)); return; }
+        var body = event.data.body;
+        resolve({
+          ok: event.data.ok,
+          status: event.data.status,
+          headers: { get: function() { return null; } },
+          json: function() { try { return Promise.resolve(JSON.parse(body)); } catch(e) { return Promise.reject(e); } },
+          text: function() { return Promise.resolve(body); }
+        });
+      }
+      window.addEventListener("message", handler);
+      parent.postMessage({
+        type: "OMNIMEDIA_FETCH_REQUEST",
+        requestId: requestId,
+        url: url.toString(),
+        options: { method: options.method || "GET", headers: options.headers || {} }
+      }, "*");
+    });
+  };
+})();
+<\/script>
 <script type="module">
 // OmniMedia Plugin Runner — slug: ${slug}
 let plugin = null;
