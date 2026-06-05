@@ -3,9 +3,7 @@
 // + browse sem limite (50 itens em vez de 20)
 
 const API_BASE   = "https://api.mangadex.org";
-const PROXY_BASE = typeof window !== "undefined" && window.OMNIMEDIA_API_URL
-  ? window.OMNIMEDIA_API_URL.replace("/api", "") + "/api/proxy/mangadex"
-  : "/api/proxy/mangadex";
+const PROXY_BASE = "https://accessible-dear-cruise-hawaiian.trycloudflare.com/api/proxy/mangadex";
 const COVER_BASE = "https://uploads.mangadex.org/covers";
 
 // Cache de tags para não buscar toda vez
@@ -59,6 +57,7 @@ async function throttledFetch(url, opts = {}) {
     ? PROXY_BASE + "?url=" + encodeURIComponent(url)
     : url;
   const res  = await fetch(proxiedUrl, {
+    headers: { "cf-access-client-id": "bypass", ...(opts.headers ?? {}) },
     ...opts,
     headers: { "Content-Type": "application/json", ...(opts.headers ?? {}) },
   });
