@@ -11,8 +11,7 @@ let _tagCache = null;
 
 async function getTagMap() {
   if (_tagCache) return _tagCache;
-  const res  = await fetch(`${API_BASE}/manga/tag`);
-  const data = await res.json();
+  const data = await throttledFetch(`${API_BASE}/manga/tag`);
   _tagCache  = {};
   for (const tag of data.data ?? []) {
     const nameEn = tag.attributes?.name?.en?.toLowerCase() ?? "";
@@ -57,7 +56,6 @@ async function throttledFetch(url, opts = {}) {
     ? PROXY_BASE + "?url=" + encodeURIComponent(url)
     : url;
   const res  = await fetch(proxiedUrl, {
-    headers: { "cf-access-client-id": "bypass", ...(opts.headers ?? {}) },
     ...opts,
     headers: { "Content-Type": "application/json", ...(opts.headers ?? {}) },
   });
