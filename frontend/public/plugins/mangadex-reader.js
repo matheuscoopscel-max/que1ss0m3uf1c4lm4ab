@@ -3,7 +3,7 @@
 // + browse sem limite (50 itens em vez de 20)
 
 const API_BASE   = "https://api.mangadex.org";
-const PROXY_BASE = "https://omnimedia-1sa.pages.dev/api/proxy/mangadex";
+const PROXY_BASE = "https://api.omnimediallc.com/api/proxy/mangadex";
 const COVER_BASE = "https://uploads.mangadex.org/covers";
 
 // Cache de tags para não buscar toda vez
