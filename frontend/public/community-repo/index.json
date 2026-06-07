@@ -11,9 +11,14 @@
       "description": "Catálogo público da MangaDex com tradução PT-BR.",
       "author": "omnimedia-community",
       "category": "comics",
-      "mediaTypes": ["image-series"],
+      "mediaTypes": [
+        "image-series"
+      ],
       "scriptUrl": "https://omnimedia-1sa.pages.dev/plugins/mangadex-reader.js",
-      "tags": ["manga", "pt-br"],
+      "tags": [
+        "manga",
+        "pt-br"
+      ],
       "language": "pt-BR",
       "contentRating": "general"
     },
@@ -24,9 +29,14 @@
       "description": "+70.000 e-books de domínio público.",
       "author": "omnimedia-community",
       "category": "ebooks",
-      "mediaTypes": ["ebook"],
+      "mediaTypes": [
+        "ebook"
+      ],
       "scriptUrl": "https://omnimedia-1sa.pages.dev/plugins/gutenberg-reader.js",
-      "tags": ["ebooks", "dominio-publico"],
+      "tags": [
+        "ebooks",
+        "dominio-publico"
+      ],
       "language": "pt-BR",
       "contentRating": "general"
     },
@@ -37,9 +47,16 @@
       "description": "Animes legendados e dublados em PT-BR.",
       "author": "omnimedia-community",
       "category": "anime",
-      "mediaTypes": ["video-stream"],
+      "mediaTypes": [
+        "video-stream"
+      ],
       "scriptUrl": "https://omnimedia-1sa.pages.dev/plugins/animesonline-reader.js",
-      "tags": ["anime", "pt-br", "dublado", "legendado"],
+      "tags": [
+        "anime",
+        "pt-br",
+        "dublado",
+        "legendado"
+      ],
       "language": "pt-BR",
       "contentRating": "general"
     },
@@ -50,11 +67,17 @@
       "description": "Conteúdo adulto. Apenas para maiores de 18 anos.",
       "author": "omnimedia-community",
       "category": "comics",
-      "mediaTypes": ["image-series"],
+      "mediaTypes": [
+        "image-series"
+      ],
       "scriptUrl": "https://omnimedia-1sa.pages.dev/plugins/nhentaibr-reader.js",
-      "tags": ["hentai", "adulto", "+18"],
+      "tags": [
+        "hentai",
+        "adulto",
+        "+18"
+      ],
       "language": "pt-BR",
-      "contentRating": "adult"
+      "contentRating": "restricted"
     }
   ]
 }
