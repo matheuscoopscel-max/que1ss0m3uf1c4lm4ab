@@ -3,7 +3,7 @@
 // Scraping via proxy da VPS (Cloudflare Pages Function)
 
 const BASE_URL  = "https://animesonlinecc.to";
-const PROXY_URL = "https://omnimedia-1sa.pages.dev/api/proxy/scraper";
+const PROXY_URL = "https://omnimediallc.com/api/proxy/scraper";
 
 async function scrapedFetch(url) {
   const res = await fetch(`${PROXY_URL}?url=${encodeURIComponent(url)}`);
