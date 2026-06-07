@@ -50,7 +50,7 @@
       "mediaTypes": [
         "video-stream"
       ],
-      "scriptUrl": "https://omnimedia-1sa.pages.dev/plugins/animesonline-reader.js",
+      "scriptUrl": "https://omnimediallc.com/plugins/animesonline-reader.js",
       "tags": [
         "anime",
         "pt-br",
@@ -70,7 +70,7 @@
       "mediaTypes": [
         "image-series"
       ],
-      "scriptUrl": "https://omnimedia-1sa.pages.dev/plugins/nhentaibr-reader.js",
+      "scriptUrl": "https://omnimediallc.com/plugins/nhentaibr-reader.js",
       "tags": [
         "hentai",
         "adulto",
