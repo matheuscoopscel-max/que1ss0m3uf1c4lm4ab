@@ -13,10 +13,6 @@ import {
 import { getNotifications, getUnreadCount, markAllRead } from "../models/Notifications.js";
 import { query } from "../db/pool.js";
 import { earnXP, checkAndUnlockAchievements } from "../models/Ranking.js";
-  listPosts, createPost, toggleReaction,
-  listComments, createComment,
-  listGroups, createGroup, joinGroup, leaveGroup,
-} from "../models/Community.js";
 
 export const communityRouter = Router();
 
