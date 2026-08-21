@@ -7,12 +7,14 @@ import { AdminDashboard }  from "../components/admin/AdminDashboard";
 import { UsersTable, PostsModeration, ShopManager, SupportTicketsAdmin } from "../components/admin/AdminTables";
 import { ApiKeysPanel }    from "../components/admin/ApiKeysPanel";
 import { AppSettings }     from "../components/admin/AppSettings";
+import { ContentSourcesManager } from "../components/admin/ContentSourcesManager";
 import { Icon }            from "../lib/icons.jsx";
 
 const SECTIONS = [
   { id: "dashboard",  label: "Dashboard",     icon: "flash",       component: AdminDashboard  },
   { id: "users",      label: "Usuários",      icon: "badge",       component: UsersTable      },
   { id: "posts",      label: "Moderação",     icon: "checklist",   component: PostsModeration },
+  { id: "sources",    label: "Conteúdo",      icon: "extensions",  component: ContentSourcesManager },
   { id: "shop",       label: "Loja",          icon: "bookmark",    component: ShopManager     },
   { id: "settings",   label: "Configurações", icon: "settings",    component: AppSettings     },
   { id: "api-keys",   label: "APIs Externas", icon: "lock",        component: ApiKeysPanel    },

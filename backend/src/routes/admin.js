@@ -12,6 +12,12 @@
 // POST /api/admin/settings       — atualiza configurações (bulk)
 // GET  /api/admin/api-keys       — lista API keys (mascarado)
 // POST /api/admin/api-keys       — salva API key criptografada
+// GET    /api/admin/repositories     — lista repositórios (curadoria de fontes)
+// POST   /api/admin/repositories     — adiciona repositório
+// PATCH  /api/admin/repositories/:id — edita/ativa/desativa repositório
+// DELETE /api/admin/repositories/:id — remove repositório
+// GET    /api/admin/plugins          — lista ativação de plugins por slug
+// PATCH  /api/admin/plugins/:slug    — ativa/desativa um plugin pra todos os usuários
 
 import { Router } from "express";
 import { body, validationResult } from "express-validator";
@@ -19,6 +25,10 @@ import { authenticate } from "../middleware/authenticate.js";
 import { requireAdmin }  from "../middleware/requireAdmin.js";
 import { query, queryOne } from "../db/pool.js";
 import { listSettings, bulkSetSettings, listApiKeys, setApiKey } from "../models/Settings.js";
+import {
+  listRepositories, createRepository, updateRepository, deleteRepository,
+  listPluginActivations, setPluginActivation,
+} from "../models/ContentSources.js";
 
 export const adminRouter = Router();
 adminRouter.use(authenticate, requireAdmin);
@@ -187,5 +197,81 @@ adminRouter.post("/api-keys", [
   try {
     await setApiKey(req.body.key, req.body.value, req.user.id);
     res.json({ success: true, message: "API key salva com segurança." });
+  } catch (err) { next(err); }
+});
+
+// ── Fontes de conteúdo: repositórios ──────────────────────────────────────────
+// Curadoria exclusiva do admin — usuários comuns não adicionam nem removem
+// repositórios, só consomem o que estiver aprovado aqui.
+adminRouter.get("/repositories", async (_req, res, next) => {
+  try {
+    const rows = await listRepositories({ activeOnly: false });
+    res.json({ success: true, repositories: rows });
+  } catch (err) { next(err); }
+});
+
+adminRouter.post("/repositories", [
+  body("url").isURL({ require_protocol: true }).withMessage("URL inválida."),
+], async (req, res, next) => {
+  const errs = validationResult(req);
+  if (!errs.isEmpty()) return res.status(400).json({ success: false, errors: errs.array() });
+  try {
+    const repo = await createRepository({
+      url:         req.body.url,
+      name:        req.body.name,
+      description: req.body.description,
+      addedBy:     req.user.id,
+    });
+    res.status(201).json({ success: true, repository: repo });
+  } catch (err) { next(err); }
+});
+
+adminRouter.patch("/repositories/:id", [
+  body("isActive").optional().isBoolean(),
+], async (req, res, next) => {
+  const errs = validationResult(req);
+  if (!errs.isEmpty()) return res.status(400).json({ success: false, errors: errs.array() });
+  try {
+    const repo = await updateRepository(req.params.id, {
+      name:        req.body.name,
+      description: req.body.description,
+      isActive:    req.body.isActive,
+    });
+    if (!repo) return res.status(404).json({ success: false, message: "Repositório não encontrado." });
+    res.json({ success: true, repository: repo });
+  } catch (err) { next(err); }
+});
+
+adminRouter.delete("/repositories/:id", async (req, res, next) => {
+  try {
+    await deleteRepository(req.params.id);
+    res.json({ success: true });
+  } catch (err) { next(err); }
+});
+
+// ── Fontes de conteúdo: ativação de plugins por slug ──────────────────────────
+// Um plugin só fica visível pra plataforma inteira depois que o admin liga
+// explicitamente aqui — mesmo que já esteja listado no index.json de um
+// repositório aprovado.
+adminRouter.get("/plugins", async (_req, res, next) => {
+  try {
+    const rows = await listPluginActivations();
+    res.json({ success: true, plugins: rows });
+  } catch (err) { next(err); }
+});
+
+adminRouter.patch("/plugins/:slug", [
+  body("isActive").isBoolean().withMessage("isActive é obrigatório."),
+], async (req, res, next) => {
+  const errs = validationResult(req);
+  if (!errs.isEmpty()) return res.status(400).json({ success: false, errors: errs.array() });
+  try {
+    const row = await setPluginActivation(req.params.slug, {
+      name:        req.body.name,
+      sourceUrl:   req.body.sourceUrl,
+      isActive:    req.body.isActive,
+      activatedBy: req.user.id,
+    });
+    res.json({ success: true, plugin: row });
   } catch (err) { next(err); }
 });

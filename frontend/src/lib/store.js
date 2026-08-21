@@ -1,12 +1,13 @@
-// FILE: frontend/src/lib/store.js — Patch #11
-// Substituído: catálogo central (/api/plugins) → repositórios externos (index.json)
-// O servidor OmniMedia não é mais consultado para listar plugins.
-// Cada repositório é uma URL fornecida pelo usuário ou pré-configurada.
+// FILE: frontend/src/lib/store.js — Patch #31
+// Repositórios e ativação de plugins agora são curados só pelo admin
+// (GET /api/repositories, GET /api/plugins/active). Usuário comum não adiciona
+// repositório nem instala plugin manualmente — installedPlugins é populado
+// automaticamente a partir do catálogo aprovado (ver usePluginBootstrap).
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { unloadPlugin } from "./pluginLoader.js";
-import { fetchRepository, refreshRepository } from "./repositoryLoader.js";
+import { refreshRepository } from "./repositoryLoader.js";
 import { getApiBaseUrl } from "./platform.js";
 
 // ── Repositório padrão da comunidade (servido localmente em dev) ──────────────
@@ -53,52 +54,42 @@ export const useOmniStore = create(
       user: null,   // { id, email, username } | null
       setUser: (user) => set({ user }),
 
-      // ── Repositórios ──────────────────────────────────────────────────────
+      // ── Repositórios (curados pelo admin) ────────────────────────────────────
       // Cada repositório contém: url, name, plugins[], status, error, lastFetched
       repositories: DEFAULT_REPOSITORIES,
 
       /**
-       * Adiciona um novo repositório pela URL e faz fetch imediato.
-       * @param {string} url
-       * @returns {Promise<{success: boolean, error?: string}>}
+       * Busca a lista de repositórios aprovados pelo admin (GET /api/repositories).
+       * Mantém DEFAULT_REPOSITORIES como fallback se a API falhar (ex: dev offline).
        */
-      addRepository: async (url) => {
-        const { repositories } = get();
-        const normalized = url.trim();
-
-        if (!normalized) return { success: false, error: "URL não pode ser vazia." };
-
-        if (repositories.find((r) => r.url === normalized)) {
-          return { success: false, error: "Este repositório já foi adicionado." };
+      loadApprovedRepositories: async () => {
+        try {
+          const res = await fetch(`${getApiBaseUrl()}/repositories`);
+          const data = await res.json();
+          if (data?.success && Array.isArray(data.repositories) && data.repositories.length > 0) {
+            set({
+              repositories: data.repositories.map((r) => ({
+                url: r.url, name: r.name ?? r.url, description: r.description ?? "",
+                author: "", version: "", website: null,
+                plugins: [], status: "idle", error: null, lastFetched: 0,
+              })),
+            });
+          }
+        } catch {
+          // Mantém DEFAULT_REPOSITORIES — não bloqueia o boot do app.
         }
-
-        // Adiciona com status loading imediatamente
-        const placeholder = {
-          url: normalized, name: normalized, plugins: [],
-          status: "loading", error: null, lastFetched: 0,
-        };
-        set((s) => ({ repositories: [...s.repositories, placeholder] }));
-
-        const result = await fetchRepository(normalized);
-        set((s) => ({
-          repositories: s.repositories.map((r) =>
-            r.url === normalized ? result : r
-          ),
-        }));
-
-        return result.status === "success"
-          ? { success: true }
-          : { success: false, error: result.error };
       },
 
-      /**
-       * Remove um repositório pelo URL.
-       * @param {string} url
-       */
-      removeRepository: (url) => {
-        set((s) => ({
-          repositories: s.repositories.filter((r) => r.url !== url),
-        }));
+      // ── Ativação de plugins (curada pelo admin) ──────────────────────────────
+      activePluginSlugs: [],
+      loadActivePluginSlugs: async () => {
+        try {
+          const res = await fetch(`${getApiBaseUrl()}/plugins/active`);
+          const data = await res.json();
+          if (data?.success) set({ activePluginSlugs: data.slugs ?? [] });
+        } catch {
+          // Sem lista do servidor — nenhum plugin é auto-ativado até reconectar.
+        }
       },
 
       /**
@@ -123,29 +114,6 @@ export const useOmniStore = create(
               ? result.value
               : { ...r, status: "error", error: "Falha ao atualizar." };
           }),
-        }));
-      },
-
-      /**
-       * Re-faz fetch de um repositório específico.
-       * @param {string} url
-       */
-      refreshRepository: async (url) => {
-        const { repositories } = get();
-        const repo = repositories.find((r) => r.url === url);
-        if (!repo) return;
-
-        set((s) => ({
-          repositories: s.repositories.map((r) =>
-            r.url === url ? { ...r, status: "loading" } : r
-          ),
-        }));
-
-        const result = await fetchRepository(url);
-        set((s) => ({
-          repositories: s.repositories.map((r) =>
-            r.url === url ? result : r
-          ),
         }));
       },
 

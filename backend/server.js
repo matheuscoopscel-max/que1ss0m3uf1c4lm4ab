@@ -41,6 +41,7 @@ import { stripeRouter, meSubscriptionRouter }from "./src/routes/stripe.js";
 import { securityRouter }                    from "./src/routes/security.js";
 import { rankingRouter }                     from "./src/routes/ranking.js";
 import { supportRouter }                     from "./src/routes/support.js";
+import { contentSourcesRouter }              from "./src/routes/contentSources.js";
 import { testConnection }                    from "./src/db/pool.js";
 
 const app  = express();
@@ -104,6 +105,7 @@ app.use("/api/security",          securityRouter);
 // Ranking, XP e conquistas — paths completos definidos dentro do router
 app.use("/api",                   rankingRouter);
 app.use("/api/support",           supportRouter);
+app.use("/api",                   contentSourcesRouter);
 
 // ── Health ────────────────────────────────────────────────────────────────────
 app.get("/api/health", async (_req, res) => {

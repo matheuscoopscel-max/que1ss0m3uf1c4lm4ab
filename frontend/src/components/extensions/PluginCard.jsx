@@ -1,12 +1,10 @@
-// FILE: frontend/src/components/extensions/PluginCard.jsx — Patch #2
-// Adicionado: feedback via toast ao instalar/remover, PluginStatusBadge,
-// indicador de status de carga do plugin.
+// FILE: frontend/src/components/extensions/PluginCard.jsx — Patch #31
+// Somente leitura pro usuário final: ativação de plugin é decisão do admin
+// (ver ContentSourcesManager no painel admin). O card aqui só mostra o que
+// já está ativo na plataforma via installedPlugins (auto-sincronizado).
 
 import { useOmniStore } from "../../lib/store";
-import { api } from "../../lib/api";
 import { Icon } from "../../lib/icons.jsx";
-import { loadPlugin } from "../../lib/pluginLoader";
-import { toastSuccess, toastError, toastInfo } from "../ui/Toast";
 import { PluginStatusBadge } from "./PluginStatusBadge";
 
 const CATEGORY_LABELS = {
@@ -23,9 +21,6 @@ const MEDIA_TYPE_ICON_NAMES = {
 
 export function PluginCard({ plugin }) {
   const isInstalled = useOmniStore((s) => s.isInstalled(plugin.slug));
-  const installPlugin = useOmniStore((s) => s.installPlugin);
-  const uninstallPlugin = useOmniStore((s) => s.uninstallPlugin);
-  const setPluginLoadStatus = useOmniStore((s) => s.setPluginLoadStatus);
 
   const cat = CATEGORY_LABELS[plugin.category] ?? {
     label: plugin.category,
@@ -33,41 +28,6 @@ export function PluginCard({ plugin }) {
   };
 
   const isRestricted = plugin.contentRating === "restricted";
-
-  async function handleInstall() {
-    installPlugin(plugin);
-    setPluginLoadStatus(plugin.slug, "loading");
-
-    const scriptUrl = plugin.scriptUrl.startsWith("/")
-      ? plugin.scriptUrl
-      : `/plugins/${plugin.slug}.js`;
-
-    const result = await loadPlugin({
-      slug: plugin.slug,
-      scriptUrl,
-      name: plugin.name,
-    });
-
-    if (result.success) {
-      setPluginLoadStatus(plugin.slug, "loaded");
-      toastSuccess(`"${plugin.name}" instalado e carregado com sucesso.`);
-      // Sincroniza com a conta do usuário se estiver logado (fire-and-forget)
-      api.post("/me/installations", {
-        slug:          plugin.slug,
-        repositoryUrl: plugin.repositoryUrl ?? "",
-        name:          plugin.name,
-        version:       plugin.version,
-      }).catch(() => {});
-    } else {
-      setPluginLoadStatus(plugin.slug, "error");
-      toastError(`Falha ao carregar "${plugin.name}": ${result.error}`);
-    }
-  }
-
-  function handleUninstall() {
-    uninstallPlugin(plugin.slug);
-    toastInfo(`"${plugin.name}" removido.`);
-  }
 
   return (
     <article className="plugin-card animate-fade-in group">
@@ -96,20 +56,16 @@ export function PluginCard({ plugin }) {
           </div>
         </div>
 
-        {/* Botão instalar/remover */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            isInstalled ? handleUninstall() : handleInstall();
-          }}
-          className={`tv-focusable shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-150 ${
+        {/* Status — ativação é decisão do admin, não do usuário */}
+        <span
+          className={`shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg ${
             isInstalled
-              ? "bg-om-danger/15 text-om-danger hover:bg-om-danger/25"
-              : "bg-om-accent text-white hover:bg-om-accent-dim active:scale-95"
+              ? "bg-om-safe/15 text-om-safe"
+              : "bg-om-border text-om-muted"
           }`}
         >
-          {isInstalled ? "Remover" : "Instalar"}
-        </button>
+          {isInstalled ? "Ativo" : "Indisponível"}
+        </span>
       </div>
 
       {/* Descrição */}
