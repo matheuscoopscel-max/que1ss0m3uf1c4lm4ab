@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- FILE: frontend/android/app/src/main/res/values/strings.xml -->
-<resources>
-    <string name="app_name">OmniMedia</string>
-    <string name="title_activity_main">OmniMedia</string>
-    <string name="package_name">app.omnimedia</string>
-    <string name="custom_url_scheme">omnimedia</string>
-</resources>

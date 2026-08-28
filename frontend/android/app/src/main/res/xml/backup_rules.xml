@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- FILE: frontend/android/app/src/main/res/xml/backup_rules.xml -->
-<!-- Exclui dados sensíveis do backup automático do Android. -->
-<full-backup-content>
-    <!-- Não faz backup das preferências internas do Capacitor -->
-    <exclude domain="sharedpref" path="." />
-</full-backup-content>
