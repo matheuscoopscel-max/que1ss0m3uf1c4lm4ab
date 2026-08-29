@@ -1,9 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getSetting } from "@/lib/settings/settings";
 
 // Placeholder da Fase 1 (Fundação). A Landing Page de conversão de
 // verdade (hero/benefícios/oferta/FAQ/CTA) é Fase 6 do A9.txt — ver README.
-export default function Home() {
+export default async function Home() {
+  const instagramUrl = await getSetting("instagram_url", process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? null);
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6 text-center">
       <Image
@@ -25,9 +28,9 @@ export default function Home() {
       >
         Comprar agora
       </Link>
-      {process.env.NEXT_PUBLIC_INSTAGRAM_URL && (
+      {instagramUrl && (
         <a
-          href={process.env.NEXT_PUBLIC_INSTAGRAM_URL}
+          href={instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-zinc-300 underline underline-offset-4 hover:text-white"

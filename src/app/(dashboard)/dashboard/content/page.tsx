@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/guards";
 import { hasLibraryAccess } from "@/lib/permissions/access";
 import { prisma } from "@/lib/database/prisma";
+import { getSetting } from "@/lib/settings/settings";
 
 export default async function ContentLibraryPage() {
   const user = await requireUser();
@@ -25,20 +26,35 @@ export default async function ContentLibraryPage() {
     );
   }
 
-  const categories = await prisma.category.findMany({
-    where: { active: true },
-    orderBy: { order: "asc" },
-    include: {
-      contents: {
-        where: { active: true },
-        orderBy: { createdAt: "desc" },
+  const [categories, telegramUrl] = await Promise.all([
+    prisma.category.findMany({
+      where: { active: true },
+      orderBy: { order: "asc" },
+      include: {
+        contents: {
+          where: { active: true },
+          orderBy: { createdAt: "desc" },
+        },
       },
-    },
-  });
+    }),
+    getSetting("telegram_group_url", process.env.TELEGRAM_GROUP_URL ?? null),
+  ]);
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Biblioteca</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight">Biblioteca</h1>
+        {telegramUrl && (
+          <a
+            href={telegramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-200 hover:border-zinc-500"
+          >
+            Entrar no grupo do Telegram
+          </a>
+        )}
+      </div>
 
       {categories.length === 0 && (
         <p className="text-zinc-400">Nenhum conteúdo publicado ainda.</p>

@@ -147,3 +147,15 @@ model Download {
   @@index([contentId])
   @@map("downloads")
 }
+
+// Config editável pelo Admin sem redeploy (Fase 5, A9.txt seção "Admin ->
+// configurações": nome/logo/preço/Telegram/textos/pixel). Chave-valor
+// simples, mesmo padrão do bot_config da EK — nunca segredo aqui, só texto
+// de exibição.
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
