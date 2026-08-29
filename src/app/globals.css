@@ -4,16 +4,54 @@
 :root {
   --background: #0a0a0a;
   --foreground: #ededed;
+  /* Extraídas do logo Oni (public/brand/oni-logo.png) — não é paleta
+     genérica de SaaS, é a identidade que já existe no produto. */
+  --color-oni-red: #e14b32;
+  --color-oni-cyan: #5fc3d1;
+  --color-oni-cream: #f2e2c4;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-oni-red: var(--color-oni-red);
+  --color-oni-cyan: var(--color-oni-cyan);
+  --color-oni-cream: var(--color-oni-cream);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+@keyframes oni-glow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.05);
+  }
+}
+
+.oni-glow {
+  animation: oni-glow 4s ease-in-out infinite;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee-scroll 28s linear infinite;
 }
