@@ -18,6 +18,16 @@ export default function Home() {
         Plataforma em construção. Acesso vitalício, pagamento único, sem
         mensalidade.
       </p>
+      {process.env.NEXT_PUBLIC_INSTAGRAM_URL && (
+        <a
+          href={process.env.NEXT_PUBLIC_INSTAGRAM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-zinc-300 underline underline-offset-4 hover:text-white"
+        >
+          Siga no Instagram
+        </a>
+      )}
     </div>
   );
 }
