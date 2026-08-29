@@ -1,0 +1,150 @@
+// Cortes MVP — schema mínimo conforme A9.txt seção 5.
+// Entidades: User, Product, Purchase, Access, Category, Content, Download.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PurchaseStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastLoginAt  DateTime?
+
+  purchases Purchase[]
+  accesses  Access[]
+  downloads Download[]
+
+  @@map("users")
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  description    String
+  price          Decimal  @db.Decimal(10, 2)
+  active         Boolean  @default(true)
+  lifetimeAccess Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  purchases Purchase[]
+  accesses  Access[]
+
+  @@map("products")
+}
+
+model Purchase {
+  id                String         @id @default(cuid())
+  userId            String
+  productId         String
+  amount            Decimal        @db.Decimal(10, 2)
+  status            PurchaseStatus @default(PENDING)
+  paymentProvider   String         @default("mercadopago")
+  externalPaymentId String?        @unique
+  paidAt            DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id])
+  product Product  @relation(fields: [productId], references: [id])
+  access  Access?
+
+  @@index([userId])
+  @@index([status])
+  @@map("purchases")
+}
+
+model Access {
+  id         String    @id @default(cuid())
+  userId     String
+  productId  String
+  purchaseId String    @unique
+  type       String    @default("lifetime")
+  expiresAt  DateTime?
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+  purchase Purchase @relation(fields: [purchaseId], references: [id])
+
+  @@index([userId])
+  @@map("access")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  contents Content[]
+
+  @@map("categories")
+}
+
+model Content {
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  description  String?
+  categoryId   String
+  storageKey   String
+  thumbnailKey String?
+  fileSize     BigInt?
+  duration     Int?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  category  Category   @relation(fields: [categoryId], references: [id])
+  downloads Download[]
+
+  @@index([categoryId])
+  @@map("contents")
+}
+
+model Download {
+  id        String   @id @default(cuid())
+  userId    String
+  contentId String
+  createdAt DateTime @default(now())
+  ipHash    String?
+  userAgent String?
+
+  user    User    @relation(fields: [userId], references: [id])
+  content Content @relation(fields: [contentId], references: [id])
+
+  @@index([userId])
+  @@index([contentId])
+  @@map("downloads")
+}
