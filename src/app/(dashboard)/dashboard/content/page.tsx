@@ -16,10 +16,10 @@ export default async function ContentLibraryPage() {
           liberar o acesso vitalício.
         </p>
         <Link
-          href="/"
+          href="/checkout"
           className="inline-block rounded bg-white px-4 py-2 text-sm font-medium text-black"
         >
-          Ver oferta
+          Comprar agora
         </Link>
       </div>
     );
