@@ -3,8 +3,17 @@ import { prisma } from "@/lib/database/prisma";
 import { hashPassword } from "@/lib/auth/password";
 import { createSessionToken, SESSION_COOKIE, SESSION_COOKIE_OPTIONS } from "@/lib/auth/session";
 import { normalizeEmail, validateRegisterInput } from "@/lib/validation/auth";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!checkRateLimit(`register:${ip}`, { limit: 10, windowMs: 60 * 60_000 })) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Tente de novo mais tarde." },
+      { status: 429 }
+    );
+  }
+
   const body = await request.json().catch(() => null);
   if (!body) {
     return NextResponse.json({ error: "Corpo da requisição inválido." }, { status: 400 });

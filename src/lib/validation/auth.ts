@@ -11,14 +11,16 @@ export function validateRegisterInput(input: {
   const email = typeof input.email === "string" ? input.email.trim() : "";
   const password = typeof input.password === "string" ? input.password : "";
 
-  if (name.length < 2) {
-    return { ok: false, error: "Nome deve ter pelo menos 2 caracteres." };
+  if (name.length < 2 || name.length > 100) {
+    return { ok: false, error: "Nome deve ter entre 2 e 100 caracteres." };
   }
-  if (!EMAIL_REGEX.test(email)) {
+  if (!EMAIL_REGEX.test(email) || email.length > 254) {
     return { ok: false, error: "Email inválido." };
   }
-  if (password.length < 8) {
-    return { ok: false, error: "Senha deve ter pelo menos 8 caracteres." };
+  // bcrypt trunca silenciosamente em 72 bytes — acima disso a senha
+  // "efetiva" seria mais curta do que o usuário digitou, sem avisar.
+  if (password.length < 8 || password.length > 72) {
+    return { ok: false, error: "Senha deve ter entre 8 e 72 caracteres." };
   }
   return { ok: true };
 }

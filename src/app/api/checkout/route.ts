@@ -3,6 +3,7 @@ import { Preference } from "mercadopago";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/database/prisma";
 import { getMercadoPagoClient } from "@/lib/mercadopago/client";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 
 const PRODUCT_SLUG = "cortes-vitalicio";
 
@@ -12,6 +13,13 @@ export async function POST() {
     user = await requireUser();
   } catch {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
+  }
+
+  if (!checkRateLimit(`checkout:${user.id}`, { limit: 10, windowMs: 60 * 60_000 })) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Tente de novo mais tarde." },
+      { status: 429 }
+    );
   }
 
   const product = await prisma.product.findUnique({ where: { slug: PRODUCT_SLUG } });

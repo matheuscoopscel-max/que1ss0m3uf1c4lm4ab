@@ -3,10 +3,19 @@ import { prisma } from "@/lib/database/prisma";
 import { verifyPassword } from "@/lib/auth/password";
 import { createSessionToken, SESSION_COOKIE, SESSION_COOKIE_OPTIONS } from "@/lib/auth/session";
 import { normalizeEmail, validateLoginInput } from "@/lib/validation/auth";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 const GENERIC_ERROR = "Credenciais inválidas.";
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!checkRateLimit(`login:${ip}`, { limit: 10, windowMs: 5 * 60_000 })) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Tente de novo em alguns minutos." },
+      { status: 429 }
+    );
+  }
+
   const body = await request.json().catch(() => null);
   if (!body) {
     return NextResponse.json({ error: "Corpo da requisição inválido." }, { status: 400 });
@@ -19,6 +28,13 @@ export async function POST(request: Request) {
 
   const email = normalizeEmail(body.email as string);
   const password = body.password as string;
+
+  if (!checkRateLimit(`login-email:${email}`, { limit: 10, windowMs: 5 * 60_000 })) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Tente de novo em alguns minutos." },
+      { status: 429 }
+    );
+  }
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !user.active) {

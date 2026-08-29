@@ -2,11 +2,20 @@ import { NextResponse } from "next/server";
 import { Payment } from "mercadopago";
 import { prisma } from "@/lib/database/prisma";
 import { getMercadoPagoClient } from "@/lib/mercadopago/client";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 // Nunca confia no corpo do webhook: só usa `data.id` pra buscar o pagamento
 // de verdade na API do Mercado Pago (autenticado com nosso access token) e
 // trata essa resposta como única fonte de verdade — conforme A9.txt.
 export async function POST(request: Request) {
+  // Limite generoso — o MP reenvia webhook em rajada quando um evento
+  // muda de status várias vezes seguidas; isso é só proteção contra
+  // flood malicioso, não deve travar retry legítimo.
+  const ip = getClientIp(request);
+  if (!checkRateLimit(`webhook:${ip}`, { limit: 120, windowMs: 60_000 })) {
+    return NextResponse.json({ error: "Rate limit excedido." }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
   const paymentId = body?.data?.id;
   const type = body?.type ?? body?.action;
